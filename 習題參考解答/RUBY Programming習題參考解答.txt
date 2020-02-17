@@ -1,0 +1,536 @@
+RUBY Programming習題參考解答
+
+第10章
+1.
+def cels2fahr(cels)
+  return Float(cels) * 9 / 5 + 32
+end
+2.
+def fahr2cels(fahr)
+  return (Float(fahr) - 32) * 5 / 9
+end
+3.
+def dice
+  return rand(6) + 1
+end
+4.
+def prime?(num)
+  return false if num < 2
+  2.upto(Math.sqrt(num)){|i|
+    if num % i == 0
+      return false
+    end
+  }
+  return true
+end
+
+第11章
+1.
+# 空的陣列可儲放1到100的值
+ary = []
+100.times{|i| ary[i] = i + 1 }
+
+# 使用Range物件的to_a方法
+ary = (1..100).to_a
+2.
+# 建立陣列
+ary = (1..100).to_a
+
+# 建立的陣列中每個元素都會乘上100
+ary2 = ary.collect{|i| i * 100 }
+p ary2
+
+# 陣列中每個元素都會乘上100
+ary.collect!{|i| i * 100 }
+p ary
+3.
+# 建立陣列
+ary = (1..100).to_a
+
+# 取出ary中3的倍數建立出新的ary2陣列
+ary2 = ary.select{|i| i % 3 == 0 }
+p ary2
+
+# 直接刪除ary中3的倍數的元素
+ary.reject!{|i| i % 3 != 0 }
+p ary
+4.
+# 建立陣列
+ary = (1..100).to_a
+
+# (a) 使用Array#reverse
+ary2 = ary.reverse
+p ary2
+
+# (b) 使用Array#sort
+ary2 = ary.sort{|a, b| -(a <=> b) }
+p ary2
+
+# (c) 使用Array#sort_by
+ary2 = ary.sort_by{|i| -i }
+p ary2
+5.
+#建立陣列
+ary = (1..100).to_a
+
+# (a) 使用Array#each
+result = 0
+ary.each{|i| result += i }
+p result
+
+# (b) 使用Array#inject
+p ary.inject(0){|memo, i| memo += i }
+6.
+#建立陣列
+ary = (1..100).to_a
+
+# 使用rand打亂陣列成不規則順序
+ary2 = ary.sort_by{|i| rand }
+p ary2
+7.
+#建立陣列
+ary = (1..100).to_a
+result = Array.new
+10.times{|i|
+  result << ary[i*10, 10]
+}
+p result
+8.
+def sum_array(ary1, ary2)
+  result = Array.new
+  ary1.zip(ary2){|a, b| result << a + b }
+  return result
+end
+
+p sum_array([1, 2, 3], [4, 6, 8])
+9.
+def balanced?(array)
+  stack = Array.new()
+  array.each{|elem|
+    case elem
+    when '('
+      stack.push(elem)
+    when '{'
+      stack.push(elem)
+    when ')'
+      prev_elem = stack.pop
+      if prev_elem != '('
+        return false
+      end
+    when '}'
+      prev_elem = stack.pop
+      if prev_elem != '{'
+        return false
+      end
+    else
+      return false
+    end
+  }
+
+  if stack.empty?
+    return true
+  else
+    return false
+  end
+end
+
+p balanced?([])                   #=> true
+p balanced?(["(",")"])            #=> true
+p balanced?(["{","(",")","}"])    #=> true
+p balanced?(["{","(",")"])        #=> false
+p balanced?(["(",")","}"])        #=> false
+
+p balanced?(["(", "{", "{", "}", "(", ")", "}", "(", ")", ")"]) #=> true
+p balanced?(["(", "{", "{", "}", "(", "}", ")", ")"])           #=> false
+
+第12章
+str = "Ruby is an object oriented programming language"
+
+# (a) 將這字串中單字分隔到成陣列的各個元素
+ary = str.split
+p ary
+
+# (b) 以字母順序排序
+p ary.sort
+
+# (c) 以字母順序排，但不區分大小寫
+p ary.sort_by{|s| s.downcase }
+
+# (d) 每個單字開頭轉成大寫
+ary = str.split
+cap_ary = ary.collect{|word| word.capitalize }
+p cap_ary.join(" ")
+
+# (f) 
+result = Hash.new(0)             # 合計數量用的hash
+chars = str.split(//)            # 字串分割
+chars.each{|c| result[c] += 1 }  # 字串出現數量
+result.keys.sort.each{|c|    
+  puts "'#{c}': #{"*" * result[c]}"
+}
+
+補充: Array#join在書中沒有介紹其用法。這個方法可連接陣列中包含的字串。也加入引數來指定在元素和元素之間加入其他字串。以下為使用的範例，可參考應用。
+
+p ["a", "b", "c"].join        #=> "abc"
+p ["a", "b", "c"].join("-")   #=> "a-b-c"
+2.
+def kan2num(string)
+  digit4 = digit3 = digit2 = digit1 = "0"
+
+  nstring = string.dup
+  nstring.gsub!(/一/, "1")
+  nstring.gsub!(/二/, "2")
+  nstring.gsub!(/三/, "3")
+  nstring.gsub!(/四/, "4")
+  nstring.gsub!(/五/, "5")
+  nstring.gsub!(/六/, "6")
+  nstring.gsub!(/七/, "7")
+  nstring.gsub!(/八/, "8")
+  nstring.gsub!(/九/, "9")
+
+  if nstring =~ /((\d)?千)?((\d)?百)?((\d)?十)?(\d)?$/
+    if $1
+      digit4 = $2 || "1"
+    end
+    if $3
+      digit3 = $4 || "1"
+    end
+    if $5
+      digit2 = $6 || "1"
+    end
+    digit1 = $7 || "0"
+  end
+
+  return (digit4+digit3+digit2+digit1).to_i
+end
+
+p kan2num("七千八百二十三")
+p kan2num("千八百二十三")
+p kan2num("八百二十三")
+p kan2num("百二十三")
+p kan2num("二十三")
+p kan2num("十三")
+p kan2num("三")
+
+3.
+def num2astrisk(str)
+  num = ""
+  str.split(//).each{|char|
+    char.sub!("0", "")
+    char.sub!("1", "*")
+    char.sub!("2", "**")
+    char.sub!("3", "***")
+    char.sub!("4", "****")
+    char.sub!("5", "*****")
+    char.sub!("6", "******")
+    char.sub!("7", "*******")
+    char.sub!("8", "********")
+    char.sub!("9", "*********")
+    num = num + num + num + num + num + num + num + num + num + num + char
+  }
+  return num
+end
+
+p num2astrisk("1")
+p num2astrisk("2")
+p num2astrisk("3")
+p num2astrisk("4")
+p num2astrisk("5")
+p num2astrisk("10")
+p num2astrisk("15")
+p num2astrisk("20")
+p num2astrisk("25")
+p num2astrisk("30")
+p num2astrisk("35")
+p num2astrisk("40")
+
+第13章
+1.
+# (1) 定義wday
+wday = {
+  "sunday"    => "星期日",
+  "monday"    => "星期一",
+  "tuesday"   => "星期二",
+  "wedensday" => "星期三",
+  "thursday"  => "星期四",
+  "friday"    => "星期五",
+  "saturday"  => "星期六",
+}
+2.
+
+# (2) 算出wday的鍵值配對數量，也就是算出大小
+p wday.size  #=> 7
+
+3
+# (3) 求出wday的大小並逐一顯示出來
+%w(sunday monday tuesday wedensday thursday friday saturday).each{|day|
+  puts "「#{day}」是{wday[day]}。"
+}
+4.
+def str2hash(str)
+  hash = Hash.new()
+  array = str.split(/\s+/)
+  while key = array.shift
+    value = array.shift
+    hash[key] = value
+  end
+  return hash
+end
+
+p str2hash("bule 藍 white 白 red 紅");
+5.
+class OrderdHash
+  def initialize()
+    @keys = Array.new()
+    @content = Hash.new()
+  end
+
+  def [](key)
+    @content[key]
+  end
+
+  def []=(key, value)
+    @content[key] = value
+    if !@keys.include?(key)
+      @keys << key
+    end
+  end
+
+  def delete(key)
+    @keys.delete(key)
+    @content.delete(key)
+  end
+
+  def keys()
+    @keys.each{|key|
+      @content[key]
+    }
+  end
+
+  def each()
+    @keys.each{|key|
+      yield(key, @content[key])
+    }
+  end
+
+end
+
+oh = OrderdHash.new()
+oh["one"] = 1
+oh["two"] = 2
+oh["three"] = 3
+oh["two"] = 4
+p oh.keys()
+oh.each{|key,value|
+  p [key, value]
+}
+
+第14章
+1.
+def get_local_and_domain(str)
+  str =~ /^([^@]+)@(.*)$/
+  localpart = $1
+  domain = $2
+  return [localpart, domain]
+end
+
+p get_local_and_domain("info@example.com")
+2.
+message = "物件導向難斃了!反正就是難斃了!"
+message.sub!(/難斃/, "簡單極")
+puts message
+3.
+def word_capitalize(str)
+  return str.split(/\-/).collect{|w| w.capitalize}.join('-')
+end
+
+p word_capitalize("in-reply-to") #=> "In-Reply-To"
+p word_capitalize("X-MAILER")    #=> "X-Mailer"
+
+第15章
+1.
+def wc(file)
+  nline = nword = nchar = 0
+  File.open(file){|io|
+    io.each{|line|
+      words = line.split(/\s+/).reject{|w| w.empty? }
+      nline += 1
+      nword += words.length
+      nchar += line.length
+    }
+  }
+  puts "lines=#{nline} words=#{nword} chars=#{nchar}"
+end
+
+wc(__FILE__)
+2.
+def tee(input, *outputs)
+  input.each{|line|
+    outputs.each{|io| io.write(line) }
+  }
+end
+
+open(__FILE__){|io|
+  tee(io, $stdout, $stderr)
+}
+3.
+def tail(file, lines=10)
+  queue = Array.new
+  open(file){|io|
+    while line = io.gets
+      queue.push(line)
+      if queue.size > lines
+        queue.shift
+      end
+    end
+  }
+  queue.each{|line| print line }
+end
+
+puts "==="
+tail(__FILE__)
+
+puts "==="
+tail(__FILE__, 3)
+
+第16章
+1.
+定義print_libraries
+def print_libraries
+  $:.each{|path|
+    next unless FileTest.directory?(path)
+    Dir.open(path){|dir|
+      dir.each{|name|
+        if name =~ /\.rb$/i
+          puts name
+        end
+      }
+    }
+  }
+end
+
+print_libraries
+書中沒詳細地提到，Ruby的程序庫除了Ruby形式之外，也有用以C語言等的程式庫。程式庫除了「.rb」之外，因為平台不同而可能有「.dll」、「.so」等的副檔名。
+以下是使用rbconfig程式庫，並對應不同平台版本而輸出Ruby可使用的程式庫檔名。
+require "rbconfig"
+
+def print_libraries
+  $:.each{|path|
+    next unless FileTest.directory?(path)
+    dlext = RbConfig::CONFIG["DLEXT"]
+    Dir.open(path){|dir|
+      dir.each{|name|
+        if name =~ /\.rb$/i || name =~ /\.#{dlext}$/i
+          puts name
+        end
+      }
+    }
+  }
+end
+
+print_libraries
+2.
+require "find"
+
+def du(path)
+  result = 0
+  Find.find(path){|f|
+    if File.file?(f)
+      result += File.size(f)
+    end
+  }
+  printf("%d %s\n", result, path)
+  return result
+end
+
+du(ARGV[0] || ".")
+
+第17章
+1.
+def jparsedate(str)
+  now = Time.now
+  year = now.year
+  month = now.month
+  day = now.day
+  hour = now.hour
+  min = now.min
+  sec = now.sec
+  str.scan(/(上午|下午)?(\d+)(年|月|日|時|分|秒)/){
+    case $3
+    when "年"; year  = $2.to_i
+    when "月"; month = $2.to_i
+    when "日"; day   = $2.to_i
+    when "時"; hour  = $2.to_i
+      hour  += 12 if $1 == "下午"
+    when "分"; min   = $2.to_i
+    when "秒"; sec   = $2.to_i
+    end
+  }
+  return Time.mktime(year, month, day, hour, min, sec)
+end
+
+p jparsedate("2006年12月23日下午8時17分50秒")
+p jparsedate("12月23日下午8時17分50秒")
+p jparsedate("上午8時17分50秒")
+p jparsedate("8時17分50秒")
+2.
+def ls_t(path)
+  entries = Dir.entries(path)               #取得entry
+  entries.reject!{|name| /^\./ =~ name }  # 刪除"."出現的部份
+
+  mtimes = Hash.new 
+  entries = entries.sort_by{|name|
+    mtimes[name] = File.mtime(File.join(path, name))
+  }
+
+# 顯示檔名與mtime
+  entries.each{|name|
+    printf("%-40s %s\n", name, mtimes[name])  }
+rescue => ex
+  puts ex.message
+end
+
+ls_t(ARGV[0] || ".")
+3.
+require "date"
+
+module Calendar
+  WEEK_TABLE = [
+    [99, 99, 99, 99, 99, 99,  1,  2,  3,  4,  5,  6,  7],
+    [ 2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14],
+    [ 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+    [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28],
+    [23, 24, 25, 26, 27, 28, 29, 30, 31, 99, 99, 99, 99],
+    [30, 31, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99],
+  ]
+
+  module_function
+
+  def cal(year, month)
+# 指定月份的第1天
+    first = Date.new(year, month, 1) 
+# 下個月第1天的前日
+    end_of_month = ((first >> 1) - 1).day  
+    start = 6 - first.wday      # 表格顯示的位置
+
+    puts first.strftime("%B %Y").center(21)
+    puts " Su Mo Tu We Th Fr St"
+    WEEK_TABLE.each{|week|
+      buf = ""
+      week[start, 7].each{|day|
+        if day > end_of_month
+          buf << "   "
+        else
+          buf << sprintf("%3d", day)
+        end
+      }
+      puts buf
+    }
+  end
+end
+
+t = Date.today
+Calendar.cal(t.year, t.month)
+
+
+
